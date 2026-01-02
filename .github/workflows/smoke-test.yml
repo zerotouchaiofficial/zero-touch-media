@@ -19,6 +19,11 @@ jobs:
       - name: Verify Python
         run: python --version
 
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
       - name: Verify FFmpeg
         run: ffmpeg -version
 
