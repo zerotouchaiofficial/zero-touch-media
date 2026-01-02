@@ -1,0 +1,30 @@
+video:
+  width: 1080
+  height: 1920
+  fps: 30
+
+shorts:
+  duration_seconds: 60
+  text_segments: 4
+  min_segment_seconds: 10
+  max_segment_seconds: 15
+
+long:
+  duration_seconds: 600
+  text_segments: 20
+
+backgrounds:
+  source: unsplash
+  min_images: 4
+  max_images: 7
+  motion: ken_burns
+  reuse: false
+
+text:
+  font: sans-serif
+  color: white
+  shadow: true
+  position: center_lower
+  max_lines: 3
+  safe_margin_percent: 8
+  animation: fade
