@@ -1,1 +1,10 @@
-# niches will be defined here
+# List of active content niches.
+# These niches are rotated automatically.
+# No niche is spammed continuously.
+
+niches:
+  - Science Facts
+  - Space & Universe
+  - Human Psychology
+  - World History
+  - Technology & Innovation
