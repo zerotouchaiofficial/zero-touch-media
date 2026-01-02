@@ -1,0 +1,7 @@
+voice:
+  engine: edge-tts
+  name: en-US-JennyNeural
+  style: narration
+  speaking_rate: 1.0
+  pitch: 0
+  volume: 0
