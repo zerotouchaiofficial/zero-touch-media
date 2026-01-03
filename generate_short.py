@@ -171,7 +171,9 @@ def generate_short():
         clips.append(scene)
         t += FACT_DURATION
 
-    video = concatenate_videoclips(clips).set_audio(audio)
+    video = concatenate_videoclips(clips)
+    video = video.set_audio(audio.set_start(0))
+
 
     video.write_videofile(
         VIDEO_FILE,
