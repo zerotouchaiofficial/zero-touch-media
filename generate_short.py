@@ -20,6 +20,7 @@ FPS = 30
 TOTAL_DURATION = 60
 FACT_COUNT = 6
 FACT_DURATION = TOTAL_DURATION / FACT_COUNT
+
 OUT_DIR = "output"
 VOICE_FILE = f"{OUT_DIR}/voice.mp3"
 VIDEO_FILE = f"{OUT_DIR}/short.mp4"
@@ -50,14 +51,16 @@ def get_facts():
     facts = []
     for topic in TOPICS:
         page = wiki.page(topic)
-        if page.exists():
-            text = page.summary.split(". ")
-            for s in text:
-                s = s.strip()
-                if 40 < len(s) < 140:
-                    facts.append(s + ".")
-                if len(facts) >= FACT_COUNT:
-                    return facts
+        if not page.exists():
+            continue
+
+        for sentence in page.summary.split(". "):
+            sentence = sentence.strip()
+            if 40 < len(sentence) < 140:
+                facts.append(sentence + ".")
+            if len(facts) >= FACT_COUNT:
+                return facts
+
     return facts[:FACT_COUNT]
 
 # =====================
@@ -65,8 +68,8 @@ def get_facts():
 # =====================
 def generate_voice(facts):
     script = " ".join(facts)
-    tts = gTTS(script)
-    tts.save(VOICE_FILE)
+    gTTS(script).save(VOICE_FILE)
+
     audio = AudioFileClip(VOICE_FILE)
 
     if audio.duration < TOTAL_DURATION:
@@ -82,20 +85,18 @@ def animated_bg(seed, duration):
         np.random.seed(seed)
         frame = np.zeros((H, W, 3), dtype=np.uint8)
 
-        # dark gradient
         for y in range(H):
-            shade = int(20 + (y / H) * 40)
+            shade = int(15 + (y / H) * 45)
             frame[y, :, :] = shade
 
-        # floating circles
         for i in range(5):
-            cx = int(W/2 + math.sin(t*0.6 + i) * 300)
-            cy = int(H/2 + math.cos(t*0.4 + i) * 500)
-            r = 120 + i*15
-            color = 60 + i*10
+            cx = int(W / 2 + math.sin(t * 0.6 + i) * 300)
+            cy = int(H / 2 + math.cos(t * 0.4 + i) * 500)
+            r = 120 + i * 15
+            color = 50 + i * 15
 
             yy, xx = np.ogrid[:H, :W]
-            mask = (xx-cx)**2 + (yy-cy)**2 <= r*r
+            mask = (xx - cx) ** 2 + (yy - cy) ** 2 <= r * r
             frame[mask] = color
 
         return frame
@@ -110,7 +111,7 @@ def text_image(text):
     draw = ImageDraw.Draw(img)
 
     try:
-        font = ImageFont.truetype("Arial.ttf", 72)
+        font = ImageFont.truetype("Arial.ttf", 80)
     except:
         font = ImageFont.load_default()
 
@@ -121,20 +122,20 @@ def text_image(text):
 
     for word in words:
         test = line + word + " "
-        w = draw.textlength(test, font=font)
-        if w <= max_width:
+        if draw.textlength(test, font=font) <= max_width:
             line = test
         else:
             lines.append(line)
             line = word + " "
     lines.append(line)
 
-    y = H//2 - (len(lines) * 45)
+    y = H // 2 - (len(lines) * 50)
+
     for l in lines:
         w = draw.textlength(l, font=font)
-        x = (W - w)//2
+        x = (W - w) // 2
         draw.text((x, y), l, fill="white", font=font)
-        y += 90
+        y += 100
 
     return np.array(img)
 
@@ -148,37 +149,25 @@ def generate_short():
 
     audio = generate_voice(facts)
 
-    clips = []
-    t = 0
+    scenes = []
 
     for i, fact in enumerate(facts):
         bg = animated_bg(i, FACT_DURATION)
 
-        txt_img = text_image(fact)
-        txt_clip = (
-            ImageClip(txt_img)
+        txt = (
+            ImageClip(text_image(fact))
             .set_duration(FACT_DURATION)
-            .set_start(0)
             .fadein(0.3)
             .fadeout(0.3)
         )
 
-        scene = CompositeVideoClip(
-            [bg, txt_clip],
-            size=(W, H)
-        ).set_duration(FACT_DURATION)
+        scene = CompositeVideoClip([bg, txt], size=(W, H)).set_duration(FACT_DURATION)
+        scenes.append(scene)
 
-        clips.append(scene)
-        t += FACT_DURATION
+    video = concatenate_videoclips(scenes).set_audio(audio)
+    video = video.set_duration(TOTAL_DURATION)
 
-    video = concatenate_videoclips(clips)
-    video = video.set_audio(audio.set_start(0))
-
-
-  video = video.set_duration(TOTAL_DURATION)
-
-  video.write_videofile(
-
+    video.write_videofile(
         VIDEO_FILE,
         fps=FPS,
         codec="libx264",
