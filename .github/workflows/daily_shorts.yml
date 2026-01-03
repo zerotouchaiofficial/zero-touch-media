@@ -1,31 +1,42 @@
-name: Daily Shorts
+name: Daily YouTube Shorts
 
 on:
-  schedule:
-    - cron: "0 3 * * *"   # 03:00 UTC daily
   workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"
 
 jobs:
-  run:
+  shorts:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - name: Install deps
+      - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg
-          pip install moviepy gtts wikipedia-api pillow numpy google-api-python-client google-auth google-auth-oauthlib
 
-      - name: Run automation
-        env:
-          YOUTUBE_TOKEN_BASE64: ${{ secrets.YOUTUBE_TOKEN_BASE64 }}
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install \
+            moviepy \
+            numpy \
+            pillow \
+            gtts \
+            wikipedia-api \
+            google-api-python-client \
+            google-auth \
+            google-auth-oauthlib \
+            google-auth-httplib2
+
+      - name: Generate & Upload Short
         run: |
           python -m core.runner.auto_runner
-
-
