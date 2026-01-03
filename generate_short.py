@@ -175,7 +175,10 @@ def generate_short():
     video = video.set_audio(audio.set_start(0))
 
 
-    video.write_videofile(
+  video = video.set_duration(TOTAL_DURATION)
+
+  video.write_videofile(
+
         VIDEO_FILE,
         fps=FPS,
         codec="libx264",
