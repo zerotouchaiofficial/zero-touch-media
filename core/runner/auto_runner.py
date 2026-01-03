@@ -1,19 +1,25 @@
-import os
-import subprocess
 import sys
-
-VIDEO_PATH = "output/short.mp4"
+import subprocess
+import os
 
 def main():
-    print("▶ Generating video...")
-    subprocess.run([sys.executable, "generate_short.py"], check=True)
+    root = os.path.abspath(os.getcwd())
+    script = os.path.join(root, "generate_short.py")
 
-    if not os.path.exists(VIDEO_PATH):
-        raise FileNotFoundError(f"Video not found: {VIDEO_PATH}")
+    print("▶ Repo root:", root)
+    print("▶ Running:", script)
 
-    print("▶ Uploading video...")
-    from core.uploader.youtube_uploader import upload_video
-    upload_video(VIDEO_PATH)
+    if not os.path.exists(script):
+        raise FileNotFoundError(f"generate_short.py not found at {script}")
+
+    result = subprocess.run(
+        [sys.executable, script],
+        stdout=sys.stdout,
+        stderr=sys.stderr
+    )
+
+    if result.returncode != 0:
+        raise RuntimeError("Video generation failed")
 
 if __name__ == "__main__":
     main()
