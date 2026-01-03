@@ -7,3 +7,13 @@ videos/
 audio/
 images/
 .cache/
+# Secrets
+auth/client_secret.json
+auth/youtube_token.json
+auth/*.secret.json
+*.pem
+*.key
+
+# OS junk
+.DS_Store
+
