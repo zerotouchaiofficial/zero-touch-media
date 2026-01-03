@@ -27,7 +27,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install \
-            moviepy \
+            moviepy==1.0.3 \
             numpy \
             pillow \
             gtts \
@@ -36,6 +36,7 @@ jobs:
             google-auth \
             google-auth-oauthlib \
             google-auth-httplib2
+
 
       - name: Generate & Upload Short
         run: |
