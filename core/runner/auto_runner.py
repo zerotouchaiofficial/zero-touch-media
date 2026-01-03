@@ -1,19 +1,19 @@
 import os
-from core.uploader.youtube_uploader import upload_video
+import subprocess
+import sys
 
-def run():
-    os.system("python generate_short.py")
+VIDEO_PATH = "output/short.mp4"
 
-    video_path = "output/short.mp4"
+def main():
+    print("▶ Generating video...")
+    subprocess.run([sys.executable, "generate_short.py"], check=True)
 
-    video_id = upload_video(
-        video_path,
-        title="Mind-Blowing Facts #shorts",
-        description="Did you know this? 🤯 #shorts"
-    )
+    if not os.path.exists(VIDEO_PATH):
+        raise FileNotFoundError(f"Video not found: {VIDEO_PATH}")
 
-    print("UPLOADED:", video_id)
+    print("▶ Uploading video...")
+    from core.uploader.youtube_uploader import upload_video
+    upload_video(VIDEO_PATH)
 
 if __name__ == "__main__":
-    run()
-
+    main()
