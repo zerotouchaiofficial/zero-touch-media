@@ -17,3 +17,10 @@ auth/*.secret.json
 # OS junk
 .DS_Store
 
+youtube-auth/
+output/
+*.mp4
+*.wav
+*.pkl
+token.txt
+client_secret.json
